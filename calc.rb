@@ -12,7 +12,7 @@ class CalcParser < Parslet::Parser
 
   rule :factor do
     (str('-').as(:op) >> primary_expr.as(:right)).as(:un_op) |
-    num
+    primary_expr
   end
 
   rule :term do
