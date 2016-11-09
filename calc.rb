@@ -1,12 +1,18 @@
 require 'parslet'
 
 class CalcParser < Parslet::Parser
-  rule :integer do
+  rule :num do
     (match('[0-9]').repeat(1)).as(:num)
   end
 
+  rule :primary_expr do
+    str('(') >> expr >> str(')') |
+    num
+  end
+
   rule :factor do
-    integer
+    (str('-').as(:op) >> primary_expr.as(:right)).as(:un_op) |
+    num
   end
 
   rule :term do
@@ -45,6 +51,19 @@ class BinOp < ASTNode
   end
 end
 
+class UnaryOp < ASTNode
+  attr_reader :op, :right
+
+  def initialize(op, right)
+    @op = op
+    @right = right
+  end
+
+  def inspect
+    "(#{op}#{right.inspect})"
+  end
+end
+
 class Num < ASTNode
   attr_reader :value
 
@@ -63,6 +82,10 @@ class CalcTransform < Parslet::Transform
     Num.new(num.to_i)
   end
 
+  rule un_op: {op: simple(:op), right: simple(:right)} do
+    UnaryOp.new(op, right)
+  end
+
   rule bin_op: subtree(:bin_op) do
     continuation = bin_op[:continuation]
     left = bin_op[:left]
@@ -74,7 +97,7 @@ class CalcTransform < Parslet::Transform
   end
 end
 
-parse_tree = CalcParser.new.parse('1+2+3*4*5+5-46/5+3/3/4')
+parse_tree = CalcParser.new.parse('1+-2+3*4*5+5-46/5+3/3/4')
 
 puts "parse_tree:\n#{parse_tree.inspect}"
 puts "applying transform"
