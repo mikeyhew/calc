@@ -14,7 +14,7 @@ class CalcParser < Parslet::Parser
   end
 
   rule :term_continuation do
-    (str('*').as(:op) >> factor.as(:right) >> term_continuation).maybe.as(:continuation)
+    (match('\*|/').as(:op) >> factor.as(:right) >> term_continuation).maybe.as(:continuation)
   end
 
   rule :expr do
@@ -22,7 +22,7 @@ class CalcParser < Parslet::Parser
   end
 
   rule :expr_continuation do
-     (str('+').as(:op) >> term.as(:right) >>expr_continuation).maybe.as(:continuation)
+     (match('\+|-').as(:op) >> term.as(:right) >>expr_continuation).maybe.as(:continuation)
   end
 
   root :expr
@@ -74,7 +74,7 @@ class CalcTransform < Parslet::Transform
   end
 end
 
-parse_tree = CalcParser.new.parse('1+2+3*4*5+6')
+parse_tree = CalcParser.new.parse('1+2+3*4*5+5-46/5+3/3/4')
 
 puts "parse_tree:\n#{parse_tree.inspect}"
 puts "applying transform"
