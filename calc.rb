@@ -116,13 +116,34 @@ class Calculator < Visitor
   def visit_UnaryOp(node)
     visit(node.right).send("#{node.op}@")
   end
+
+  def repl
+    require 'readline'
+    loop do
+      begin
+        line = Readline.readline("calc> ", true)
+        break unless line
+
+        ast = CalcTransform.new.apply(CalcParser.new.parse(line))
+        puts ast.inspect
+        puts visit(ast).to_s('F')
+      rescue Interrupt
+        puts ''
+      rescue Parslet::ParseFailed => failure
+        puts failure.cause.ascii_tree
+      end
+    end
+  end
+
 end
 
-parse_tree = CalcParser.new.parse('1+-2+3*4*5+5-46/5+3/3/4')
+# parse_tree = CalcParser.new.parse('1+-2+3*4*5+5-46/5+3/3/4')
 
-puts "parse_tree:\n#{parse_tree.inspect}"
-puts "applying transform"
-ast = CalcTransform.new.apply(parse_tree)
-puts "ast:\n#{ast.inspect}"
-result = Calculator.new.visit(ast)
-puts "result:\n#{result.to_s('F')}"
+# puts "parse_tree:\n#{parse_tree.inspect}"
+# puts "applying transform"
+# ast = CalcTransform.new.apply(parse_tree)
+# puts "ast:\n#{ast.inspect}"
+# result = Calculator.new.visit(ast)
+# puts "result:\n#{result.to_s('F')}"
+
+Calculator.new.repl
