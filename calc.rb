@@ -1,4 +1,5 @@
 require 'parslet'
+require 'bigdecimal'
 
 class CalcParser < Parslet::Parser
   rule :num do
@@ -97,9 +98,31 @@ class CalcTransform < Parslet::Transform
   end
 end
 
+class Visitor
+  def visit(node)
+    send("visit_#{node.class.name}", node)
+  end
+end
+
+class Calculator < Visitor
+  def visit_Num(node)
+    BigDecimal(node.value)
+  end
+
+  def visit_BinOp(node)
+    visit(node.left).send(node.op, visit(node.right))
+  end
+
+  def visit_UnaryOp(node)
+    visit(node.right).send("#{node.op}@")
+  end
+end
+
 parse_tree = CalcParser.new.parse('1+-2+3*4*5+5-46/5+3/3/4')
 
 puts "parse_tree:\n#{parse_tree.inspect}"
 puts "applying transform"
 ast = CalcTransform.new.apply(parse_tree)
 puts "ast:\n#{ast.inspect}"
+result = Calculator.new.visit(ast)
+puts "result:\n#{result.to_s('F')}"
