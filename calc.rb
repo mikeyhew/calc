@@ -120,6 +120,11 @@ class Calculator < Visitor
 
   def repl
     require 'readline'
+
+    # not sure how this works, but it's supposed to
+    # save command history
+    stty_save = `stty -g`.chomp
+
     loop do
       begin
         line = Readline.readline("calc> ", true)
@@ -134,6 +139,9 @@ class Calculator < Visitor
         puts failure.cause.ascii_tree
       end
     end
+
+    puts ''
+    system("stty", stty_save)
   end
 
 end
