@@ -2,8 +2,9 @@ require 'parslet'
 require 'bigdecimal'
 
 class CalcParser < Parslet::Parser
+
   rule :num do
-    (match('[0-9]').repeat(1)).as(:num)
+    (match['0-9'].repeat(1)).as(:num)
   end
 
   rule :primary_expr do
@@ -12,7 +13,7 @@ class CalcParser < Parslet::Parser
   end
 
   rule :factor do
-    (str('-').as(:op) >> primary_expr.as(:right)).as(:un_op) |
+    (match['-'].as(:op) >> primary_expr.as(:right)).as(:un_op) |
     primary_expr
   end
 
@@ -21,7 +22,7 @@ class CalcParser < Parslet::Parser
   end
 
   rule :term_continuation do
-    (match('\*|/').as(:op) >> factor.as(:right) >> term_continuation).maybe.as(:continuation)
+    (match['*/'].as(:op) >> factor.as(:right) >> term_continuation).maybe.as(:continuation)
   end
 
   rule :expr do
@@ -29,7 +30,7 @@ class CalcParser < Parslet::Parser
   end
 
   rule :expr_continuation do
-     (match('\+|-').as(:op) >> term.as(:right) >>expr_continuation).maybe.as(:continuation)
+     (match['+-'].as(:op) >> term.as(:right) >>expr_continuation).maybe.as(:continuation)
   end
 
   root :expr
