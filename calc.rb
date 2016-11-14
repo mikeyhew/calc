@@ -132,7 +132,7 @@ class Calculator < Visitor
 
         ast = CalcTransform.new.apply(CalcParser.new.parse(line))
         puts ast.inspect
-        puts visit(ast).to_s('F')
+        puts visit(ast).to_s('F').sub(/\.0$/, "")
       rescue Interrupt
         puts ''
       rescue Parslet::ParseFailed => failure
