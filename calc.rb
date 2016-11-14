@@ -131,7 +131,7 @@ class Calculator < Visitor
         break unless line
 
         ast = CalcTransform.new.apply(CalcParser.new.parse(line))
-        puts ast.inspect
+        # puts ast.inspect
         puts visit(ast).to_s('F').sub(/\.0$/, "")
       rescue Interrupt
         puts ''
