@@ -1,5 +1,7 @@
-PATH
-  remote: ../parslet
+GIT
+  remote: https://github.com/mikeyhew/parslet
+  revision: a98882013b42c6c7b188455ebfda7eab82666c43
+  branch: ignore-whitespace
   specs:
     parslet (1.7.1)
 
@@ -19,6 +21,9 @@ PLATFORMS
 DEPENDENCIES
   parslet!
   pry
+
+RUBY VERSION
+   ruby 2.3.1p112
 
 BUNDLED WITH
    1.13.5
