@@ -81,7 +81,7 @@ end
 class CalcTransform < Parslet::Transform
 
   rule num: simple(:num) do
-    Num.new(num.to_i)
+    Num.new(num)
   end
 
   rule un_op: {op: simple(:op), right: simple(:right)} do
