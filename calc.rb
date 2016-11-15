@@ -4,7 +4,10 @@ require 'bigdecimal'
 class CalcParser < Parslet::Parser
 
   rule :num do
-    (match['0-9'].repeat(1) << (str('.') << match['0-9'].repeat(1)).maybe).as(:num)
+    (
+      match['0-9'].repeat(0) << str('.') << match['0-9'].repeat(1) |
+      match['0-9'].repeat(1)
+    ).as(:num)
   end
 
   rule :primary_expr do
