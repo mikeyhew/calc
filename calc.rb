@@ -12,9 +12,17 @@ class CalcParser < Parslet::Parser
     num
   end
 
-  rule :factor do
+  rule :base_or_exponent do
     (match['-'].as(:op) >> primary_expr.as(:right)).as(:un_op) |
     primary_expr
+  end
+
+  rule :factor do
+    (base_or_exponent.as(:left) >> factor_continuation).as(:bin_op)
+  end
+
+  rule :factor_continuation do
+    (str('**').as(:op) >> base_or_exponent.as(:right) >> factor_continuation).maybe.as(:continuation)
   end
 
   rule :term do
