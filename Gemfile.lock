@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/mikeyhew/parslet
-  revision: a98882013b42c6c7b188455ebfda7eab82666c43
+  revision: 65525829ed9898f45cac72574eba028bbd03477b
   branch: ignore-whitespace
   specs:
     parslet (1.7.1)
