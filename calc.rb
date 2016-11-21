@@ -3,10 +3,19 @@ require 'bigdecimal'
 
 class CalcParser < Parslet::Parser
 
+  rule :digit do
+    match['0-9']
+  end
+
+  rule :comma_three_digits do
+    str(',') << digit.repeat(3,3)
+  end
+
   rule :num do
     (
-      match['0-9'].repeat(0) << str('.') << match['0-9'].repeat(1) |
-      match['0-9'].repeat(1)
+      digit.repeat(1,3) << comma_three_digits.repeat(1) << (str('.') << digit.repeat(1)).maybe |
+      digit.repeat(0) << str('.') << digit.repeat(1) |
+      digit.repeat(1)
     ).as(:num)
   end
 
@@ -118,7 +127,7 @@ end
 
 class Calculator < Visitor
   def visit_Num(node)
-    BigDecimal(node.value)
+    BigDecimal(node.value.to_s.gsub(/,/, ''))
   end
 
   def visit_BinOp(node)
@@ -127,6 +136,16 @@ class Calculator < Visitor
 
   def visit_UnaryOp(node)
     visit(node.right).send("#{node.op}@")
+  end
+
+  def format_bigdecimal(d)
+    whole, fractional = d.to_s('F').split('.')
+    whole = whole.gsub(/(?<=[0-9])(?=([0-9]{3})+($))/, ',')
+    if fractional =~ /^0$/
+      whole
+    else
+      whole + '.' + fractional
+    end
   end
 
   def repl
@@ -143,7 +162,7 @@ class Calculator < Visitor
 
         ast = CalcTransform.new.apply(CalcParser.new.parse(line))
         # puts ast.inspect
-        puts visit(ast).to_s('F').sub(/\.0$/, "")
+        puts format_bigdecimal(visit(ast))
       rescue Interrupt
         puts ''
       rescue Parslet::ParseFailed => failure
